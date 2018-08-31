@@ -1,5 +1,5 @@
 {
-  "name": "@lomocc/react-app-rewire-less-modules",
+  "name": "react-app-rewire-less-modules-lomocc",
   "version": "1.0.0",
   "dependencies": {
     "less": "^3.0.1",
