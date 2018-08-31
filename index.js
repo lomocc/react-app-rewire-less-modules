@@ -1,5 +1,5 @@
-const path = require("path");
-const { getLoader, loaderNameMatches } = require("react-app-rewired");
+const path = require('path');
+const { getLoader, loaderNameMatches } = require('react-app-rewired');
 
 const lessExtension = /\.less$/;
 const lessModuleExtension = /\.module.less$/;
@@ -8,26 +8,26 @@ function createRewireLess(lessLoaderOptions = {}) {
   return function(config, env) {
     // Exclude all less files (including module files) from file-loader
     const fileLoader = getLoader(config.module.rules, rule => {
-      return loaderNameMatches(rule, "file-loader") && rule.exclude;
+      return loaderNameMatches(rule, 'file-loader') && rule.exclude;
     });
     fileLoader.exclude.push(lessExtension);
 
-    const createRule = (rule, cssRules) => {
-      if (env === "production") {
+    const createRule = (rule, cssRules = {}) => {
+      if (env === 'production') {
         return {
-          ...rule,
+          ...(rule || {}),
           loader: [
-            ...cssRules.loader,
-            { loader: "less-loader", options: lessLoaderOptions },
-          ],
+            ...((cssRules || {}).loader || []),
+            { loader: 'less-loader', options: lessLoaderOptions }
+          ]
         };
       } else {
         return {
-          ...rule,
+          ...(rule || {}),
           use: [
-            ...cssRules.use,
-            { loader: "less-loader", options: lessLoaderOptions },
-          ],
+            ...((cssRules || {}).use || []),
+            { loader: 'less-loader', options: lessLoaderOptions }
+          ]
         };
       }
     };
@@ -35,13 +35,13 @@ function createRewireLess(lessLoaderOptions = {}) {
     const lessRules = createRule(
       {
         test: lessExtension,
-        exclude: lessModuleExtension,
+        exclude: lessModuleExtension
       },
       // Get a copy of the CSS loader
       getLoader(
         config.module.rules,
-        rule => String(rule.test) === String(/\.css$/),
-      ),
+        rule => String(rule.test) === String(/\.css$/)
+      )
     );
 
     const lessModuleRules = createRule(
@@ -49,12 +49,12 @@ function createRewireLess(lessLoaderOptions = {}) {
       // Get a copy of the CSS module loader
       getLoader(
         config.module.rules,
-        rule => String(rule.test) === String(/\.module\.css$/),
-      ),
+        rule => String(rule.test) === String(/\.module\.css$/)
+      )
     );
 
     const oneOfRule = config.module.rules.find(
-      rule => rule.oneOf !== undefined,
+      rule => rule.oneOf !== undefined
     );
     if (oneOfRule) {
       oneOfRule.oneOf.unshift(lessRules);
